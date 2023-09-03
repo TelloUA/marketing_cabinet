@@ -1,6 +1,7 @@
 <?php
 require_once "blocks/config.php";
-function test_input($data, $isEmail = false) {
+function test_input($data, $isEmail = false): string
+{
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -20,24 +21,28 @@ function connect() {
     return $connection;
 }
 
-function close($connection) {
+function close($connection): void
+{
     $connection->close();
 }
 
-function noReturnConnect($query) {
+function noReturnConnect($query): void
+{
     $connection = connect();
     $connection->query($query);
     close($connection);
 }
 
-function selectConnect($query) {
+function selectConnect($query): mysqli_result|bool
+{
     $connection = connect();
     $result = $connection->query($query);
     close($connection);
     return $result;
 }
 
-function drawSelectOptions($array, $option){
+function drawSelectOptions($array, $option): string
+{
     $allRows = '';
     foreach ($array as $item) {
         $row = '<option value="'.$item.'"';

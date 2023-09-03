@@ -1,4 +1,9 @@
 <?php
+require dirname(__DIR__).'/vendor/autoload.php';
+
+use App\Entity\CampaignType;
+use App\Entity\Device;
+
 require "blocks/header.php";
 ?>
 
@@ -8,8 +13,8 @@ require "blocks/header.php";
 <?php
 $name = $type = $device = $geo = $geoId = $url = "";
 $nameErr = $typeErr = $deviceErr = $geoErr = $urlErr = "";
-$types = array("product", "push");
-$devices = array("desktop", "mobile");
+$types = CampaignType::getTypes();
+$devices = Device::getDevices();
 
 if (isset($_COOKIE['id']) ) {
     $user_id = $_COOKIE['id'];
