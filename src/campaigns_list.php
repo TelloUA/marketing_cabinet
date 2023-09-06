@@ -9,6 +9,11 @@ require "blocks/header.php";
         Create new campaign
     </button>
     <?php
+    echo $_SERVER['REQUEST_URI'];
+    $routes = explode('/', $_SERVER['REQUEST_URI']);
+    var_dump($routes);
+    ?>
+    <?php
         if (isset($_COOKIE['id']) ) {
             // showing user campaigns
             $user_id = $_COOKIE['id'];

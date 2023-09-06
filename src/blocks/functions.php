@@ -1,5 +1,5 @@
 <?php
-require_once "blocks/config.php";
+require_once "config.php";
 function test_input($data, $isEmail = false): string
 {
     $data = trim($data);
