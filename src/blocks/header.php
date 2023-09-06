@@ -1,5 +1,5 @@
 <?php
-require_once "blocks/functions.php";
+require_once "functions.php";
 ?>
 <!DOCTYPE html>
 <html>
@@ -8,7 +8,7 @@ require_once "blocks/functions.php";
 </head>
 <div class="container">
     <header>
-        <!-- <a href='test_link.php'>Test</a> | -->
+        <!-- <a href='/test'>Test</a> | -->
         <?php if(isset($_COOKIE['id'])) {
             $user_id = $_COOKIE['id'];
             $takeUserName = "SELECT `name` FROM `users` WHERE `id` = '$user_id'";
@@ -19,12 +19,12 @@ require_once "blocks/functions.php";
                 $userNameOutput = $userName['name'];
             }
             echo "<span>Hello ".$userNameOutput. "! | </span>
-                  <a href='profile.php'>Profile</a> |
-                  <a href='campaigns_list.php'>Campaigns</a> |
-                  <a href='exit.php'>Exit</a>";
+                  <a href='/profile'>Profile</a> |
+                  <a href='/campaign/list'>Campaigns</a> |
+                  <a href='/exit'>Exit</a>";
         } else {
-            echo "<a href='authorization.php'>Authorization</a> |
-                  <a href='registration.php'>Registration</a>";
+            echo "<a href='/authorization'>Authorization</a> |
+                  <a href='/registration'>Registration</a>";
         } ?>
         <style>
             .error {color: #FF0000;}

@@ -5,7 +5,7 @@ require "blocks/header.php";
 <h1>Campaigns</h1>
 <div style="container">
 
-    <button onclick="window.location.href='campaigns_create.php'">
+    <button onclick="window.location.href='/campaign/create'">
         Create new campaign
     </button>
     <?php
@@ -13,7 +13,7 @@ require "blocks/header.php";
             // showing user campaigns
             $user_id = $_COOKIE['id'];
         } else {
-            header('Location: authorization.php');
+            header('Location: authorization');
         }
 
         $userCampaignsSelect = "SELECT 

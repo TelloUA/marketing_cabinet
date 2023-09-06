@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <form action="<?php echo htmlspecialchars('/campaign/create'); ?>" method="post">
     <label for="name"> Campaign Name <span class="error">*</span></label>
         <input type="text" name="name" value="<?php echo $name;?>" class="form-control">
         <span class="error"><?php echo $nameErr; ?></span><br>

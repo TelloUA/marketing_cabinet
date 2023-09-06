@@ -57,7 +57,7 @@ require "blocks/header.php";
     <li>At least one special character - @$!%*#?&_.</li>
     <li>Minimum length of 8 characters.</li>
 </ol>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <form action="<?php echo htmlspecialchars('/registration'); ?>" method="post">
         <label for="email">Email <span class="error">*</span></label>
         <input type="text" name="email" value="<?php echo $email;?>" class="form-control">
         <span class="error"><?php echo $emailErr; ?></span><br>
