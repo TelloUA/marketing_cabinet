@@ -24,7 +24,7 @@ if (isset($_COOKIE['id']) ) {
     $communicationChannel = $userFullDataArray['communication_channel'];
     $communicationInfo = $userFullDataArray['communication_info'];
 } else {
-    header('Location: authorization.php');
+    //header('Location: authorization');
 }
 
 
@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 ?>
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="profileData">
+    <form action="<?php echo '/profile'; ?>" method="post" id="profileData">
         <label for="name">Your name <span class="error">*</span></label>
         <input type="text" name="name" value="<?php echo $name;?>" class="form-control">
         <span class="error"><?php echo $nameErr; ?></span><br>

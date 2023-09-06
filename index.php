@@ -2,17 +2,11 @@
 ini_set('display_errors', 1);
 require 'vendor/autoload.php';
 
+require_once 'src/Route.php';
 
 use App\Route;
 
-echo 'index her <br>';
-print_r($_GET);
-
-//echo $_SERVER['REQUEST_URI'];
-//$routes = explode('/', $_SERVER['REQUEST_URI']);
-//var_dump($routes);
-
-//Route::start();
+Route::start();
 
 /*
  * campaign/list

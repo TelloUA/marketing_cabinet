@@ -5,20 +5,15 @@ require "blocks/header.php";
 <h1>Campaigns</h1>
 <div style="container">
 
-    <button onclick="window.location.href='campaigns_create.php'">
+    <button onclick="window.location.href='/campaign/create'">
         Create new campaign
     </button>
-    <?php
-    echo $_SERVER['REQUEST_URI'];
-    $routes = explode('/', $_SERVER['REQUEST_URI']);
-    var_dump($routes);
-    ?>
     <?php
         if (isset($_COOKIE['id']) ) {
             // showing user campaigns
             $user_id = $_COOKIE['id'];
         } else {
-            header('Location: authorization.php');
+            header('Location: authorization');
         }
 
         $userCampaignsSelect = "SELECT 

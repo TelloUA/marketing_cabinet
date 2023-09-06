@@ -12,11 +12,11 @@ class Route
         $routes = explode('/', $_SERVER['REQUEST_URI']);
         $info = $_SERVER['REQUEST_URI'];
 
-        if ( !empty($routes[2]) ) {
-            switch ($routes[2]) {
+        if ( !empty($routes[1]) ) {
+            switch ($routes[1]) {
                 case 'campaign':
-                    if (!empty($routes[3])) {
-                        switch ($routes[3]) {
+                    if (!empty($routes[2])) {
+                        switch ($routes[2]) {
                             case 'list':
                                 include 'campaigns_list.php';
                                 break;
@@ -24,17 +24,17 @@ class Route
                                 include 'campaigns_create.php';
                                 break;
                             default:
-                                Route::ErrorPage404($info);
+                                Route::ErrorPage404();
                         }
                     } else {
-                        Route::ErrorPage404($info);
+                        Route::ErrorPage404();
                     }
                     break;
                 case 'profile':
                     include 'profile.php';
                     break;
                 case 'authorization':
-                    //include 'authorization.php';
+                    include 'authorization.php';
                     break;
                 case 'registration':
                     include 'registration.php';
@@ -45,19 +45,20 @@ class Route
                 case 'test':
                     include 'test_link.php';
                     break;
-                case 'index.php':
-                    include 'authorization.php';
+                case '404':
+                    include '404.php';
                     break;
                 default:
-                    echo '<br>first default<br>';
-                    include '404.php';
-                    //Route::ErrorPage404($info);
+                    Route::ErrorPage404();
             }
         }
     }
 
-    static function ErrorPage404($info): void
+    static function ErrorPage404(): void
     {
-        header('Location: 404.php');
+        //$host = 'http://'.$_SERVER['HTTP_HOST'].'/';
+        header('HTTP/1.1 404 Not Found');
+        header("Status: 404 Not Found");
+        header('Location: /404');
     }
 }

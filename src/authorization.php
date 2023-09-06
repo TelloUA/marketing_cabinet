@@ -28,7 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     setcookie('id', $row['id'], time() + 1800);
                     //$_SESSION['user'] = $row['email'];
                     //$_SESSION['user_id'] = $row['id'];
-                    header('Location: profile.php');
+                    header('Location: profile');
+                    echo $_COOKIE['id'];
                 } else {
                     $authErr = $mainErr;
                 }
@@ -41,7 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+
+    <span></span>
+    <form action="<?php echo htmlspecialchars('authorization'); ?>" method="post">
         <label for="email">Email <span class="error">*</span></label>
         <input type="text" name="email" value="<?php echo $email;?>" class="form-control">
         <span class="error"><?php echo $emailErr; ?></span><br>
