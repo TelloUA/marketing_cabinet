@@ -59,6 +59,12 @@ class Route
                     $controller = new Controller_campaign();
                     $controller->list($GLOBALS['user_id']);
                     break;
+                case 'new_create':
+                    include "models/Model_campaign.php";
+                    include "controllers/Controller_campaign.php";
+                    $controller = new Controller_campaign();
+                    $controller->create();
+                    break;
                 case '404':
                     include '404.php';
                     break;

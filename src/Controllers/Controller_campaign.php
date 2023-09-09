@@ -21,4 +21,10 @@ class Controller_campaign
         $data = $this->model_campaign->list($user_id);
         $this->view->generate('campaign_list_view.php', 'template_view.php', $data);
     }
+
+    public function create(): void
+    {
+        $data = $this->model_campaign->create();
+        $this->view->generate('campaign_create_view.php', 'template_view.php', $data);
+    }
 }

@@ -3,7 +3,7 @@ if (!$GLOBALS['isLogged']) {
     header('Location: authorization');
 }
 ?>
-
+<body>
 <h1>Campaigns</h1>
 <div style="container">
 
@@ -49,3 +49,4 @@ if (!$GLOBALS['isLogged']) {
 
     ?>
 </div>
+</body>

@@ -4,32 +4,21 @@ namespace App\Models;
 
 
 use App\DataBase\DbExecutor;
+use App\Entity\CampaignType;
+use App\Entity\Device;
 
 class Model_campaign
 {
     public function list($user_id): array {
         return $this->takeListData($user_id);
-        /*
-     array(
-        array(
-            'id' => '33',
-            'name' => 'Good Campaign with MVC',
-            'type' => 'Product',
-            'device' => 'mobile',
-            'geo' => 'Camerooooon',
-            'url' => 'https://some-new-site.here.com',
-            'when_add' => '2023-01-01'),
-        array(
-            'id' => '33',
-            'name' => 'Good Campaign with MVC',
-            'type' => 'Product',
-            'device' => 'mobile',
-            'geo' => 'Camerooooon',
-            'url' => 'https://some-new-site.here.com',
-            'when_add' => '2023-01-01'),
+    }
 
-        )
-        */
+    public function create(): array {
+        return $this->takeCreateData();
+    }
+
+    public function createValidation(): array|bool {
+        //
     }
 
     //Дуже тимчасове рішення, просто щоб запрацювала основна структура MVC, модель буде якось розділятися далі
@@ -65,6 +54,23 @@ class Model_campaign
                 );
             }
         }
+        return $data;
+    }
+
+    private function takeCreateData(): array {
+        $data = array();
+        $data['types'] = CampaignType::getTypes();
+        $data['devices'] = Device::getDevices();
+        $countriesQuery = "SELECT `id`, `name`, `short_name` FROM `geo` ORDER BY `name`;";
+        $conn = new DbExecutor(true, $countriesQuery);
+        $conn->execute();
+        $dataSql = $conn->getResult();
+        if ($dataSql->num_rows > 0) {
+            while ($row = $dataSql->fetch_assoc()) {
+                $data['geoList'][] = $row['name'];
+            }
+        }
+
         return $data;
     }
 }
