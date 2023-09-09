@@ -41,7 +41,11 @@ if (!$GLOBALS['isLogged']) {
                                             </td>
                                         </tr>";
     }
+    if (count($data) > 0) {
+        echo $campaignsTable;
+    } else {
+        echo "No campaigns, let's create someone";
+    }
 
-    echo $campaignsTable;
     ?>
 </div>
