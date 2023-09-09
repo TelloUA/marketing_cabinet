@@ -2,19 +2,24 @@
 ini_set('display_errors', 1);
 require 'vendor/autoload.php';
 
-require_once 'src/Route.php';
-
 use App\Route;
+
+$isLogged = false;
+$user_id = null;
+if(isset($_COOKIE['id'])) {
+    $isLogged = true;
+    $user_id = $_COOKIE['id'];
+}
 
 Route::start();
 
 /*
  * campaign/list
  * campaign/create
- * profile
- * authorization
- * registration
- * exit
+ * ? user/profile
+ * ? login/authorization
+ * ? login/registration
+ * ? login/exit
  * test
  */
 

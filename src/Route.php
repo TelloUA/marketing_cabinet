@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Controllers\Controller_campaign;
+
 class Route
 {
     static function start(): void
@@ -11,6 +13,12 @@ class Route
 
         $routes = explode('/', $_SERVER['REQUEST_URI']);
         $info = $_SERVER['REQUEST_URI'];
+ /*
+        if ($GLOBALS['user_id'] === null) {
+            include 'authorization.php';
+            return;
+        }
+ */
 
         if ( !empty($routes[1]) ) {
             switch ($routes[1]) {
@@ -45,6 +53,12 @@ class Route
                 case 'test':
                     include 'test_link.php';
                     break;
+                case 'new_list':
+                    include "models/Model_campaign.php";
+                    include "controllers/Controller_campaign.php";
+                    $controller = new Controller_campaign();
+                    $controller->list($GLOBALS['user_id']);
+                    break;
                 case '404':
                     include '404.php';
                     break;
@@ -56,9 +70,6 @@ class Route
 
     static function ErrorPage404(): void
     {
-        //$host = 'http://'.$_SERVER['HTTP_HOST'].'/';
-        header('HTTP/1.1 404 Not Found');
-        header("Status: 404 Not Found");
         header('Location: /404');
     }
 }

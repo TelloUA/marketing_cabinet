@@ -9,8 +9,6 @@ require "blocks/header.php";
     $emailErr = $pwdErr = ""; //error in forms
     $success = false;
 
-    //open connection to DB
-
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($_POST["email"])) {
             $emailErr = "Email is required";
