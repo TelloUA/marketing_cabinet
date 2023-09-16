@@ -1,8 +1,12 @@
 <?php
+
+use App\Views\ViewHelper;
+
 if (!$GLOBALS['isLogged']) {
     header('Location: authorization');
 }
-
+//$name = $type = $device = $geo = $url = '';
+//$nameErr = $typeErr = $deviceErr = $geoErr = $urlErr = '';
 $name = $data['name'];
 $nameErr = $data['nameErr'];
 $type = $data['type'];
@@ -22,7 +26,7 @@ $urlErr = $data['urlErr'];
 <h1>Creating campaign</h1>
 <div style="container; width: 500px">
 
-    <form action="<?php echo '/new_create'; ?>" method="post">
+    <form action="<?php echo '/campaign/create'; ?>" method="post">
         <!-- Campaign name field -->
         <label for="name"> Campaign Name <span class="error">*</span></label>
         <input type="text" name="name" value="<?php echo $name;?>" class="form-control">
@@ -33,7 +37,7 @@ $urlErr = $data['urlErr'];
         <select name="type" id="type" class="form-control">
             <option value="" <?php if($type == "") {echo "selected";}?> ></option>
             <!-- Adding options for select-->
-            <?php echo drawSelectOptions2($types, $type); ?>
+            <?php echo ViewHelper::drawOptions($types, $type); ?>
         </select>
         <span class="error"><?php echo $typeErr; ?></span><br>
 
@@ -42,7 +46,7 @@ $urlErr = $data['urlErr'];
         <select name="device" id="device" class="form-control">
             <option value="" <?php if($device == "") {echo "selected";}?> ></option>
             <!-- Adding options for select-->
-            <?php echo drawSelectOptions2($devices, $device); ?>
+            <?php echo ViewHelper::drawOptions($devices, $device); ?>
         </select>
         <span class="error"><?php echo $deviceErr; ?></span><br>
 
@@ -50,7 +54,7 @@ $urlErr = $data['urlErr'];
         <label for="geo">Country <span class="error">*</span></label>
         <select name="geo" id="device" class="form-control">
             <option value="" <?php if($geo == "") {echo "selected";}?> ></option>
-            <?php echo drawSelectOptions2($geoList, $geo); ?>
+            <?php echo ViewHelper::drawOptions($geoList, $geo); ?>
         </select>
         <span class="error"><?php echo $geoErr; ?></span><br>
 
