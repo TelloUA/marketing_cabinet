@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Controllers\Controller_campaign;
+use App\Controllers\ControllerCampaign;
 
 class Route
 {
@@ -26,10 +26,16 @@ class Route
                     if (!empty($routes[2])) {
                         switch ($routes[2]) {
                             case 'list':
-                                include 'campaigns_list.php';
+                                include "models/ModelCampaign.php";
+                                include "controllers/ControllerCampaign.php";
+                                $controller = new ControllerCampaign();
+                                $controller->list();
                                 break;
                             case 'create':
-                                include 'campaigns_create.php';
+                                include "models/ModelCampaign.php";
+                                include "controllers/ControllerCampaign.php";
+                                $controller = new ControllerCampaign();
+                                $controller->create();
                                 break;
                             default:
                                 Route::ErrorPage404();
@@ -52,12 +58,6 @@ class Route
                     break;
                 case 'test':
                     include 'test_link.php';
-                    break;
-                case 'new_list':
-                    include "models/Model_campaign.php";
-                    include "controllers/Controller_campaign.php";
-                    $controller = new Controller_campaign();
-                    $controller->list($GLOBALS['user_id']);
                     break;
                 case '404':
                     include '404.php';

@@ -1,4 +1,5 @@
 <?php
+
 include 'src/blocks/header.php';
-include $content_view;
+include $contentView;
 include 'src/blocks/footer.php';

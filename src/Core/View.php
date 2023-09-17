@@ -6,7 +6,7 @@ class View
 {
 //public $template_view; // здесь можно указать общий вид по умолчанию.
 
-    function generate($content_view, $template_view, $data = null): void
+    function generate($contentView, $templateView, $data = null): void
     {
         /*
         if(is_array($data)) {
@@ -15,6 +15,6 @@ class View
         }
         */
 
-        include 'src/Views/'.$template_view;
+        include 'src/Views/'.$templateView;
     }
 }
