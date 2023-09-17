@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Controllers\ControllerCampaign;
+use App\Controllers\ControllerUser;
 
 class Route
 {
@@ -39,6 +40,20 @@ class Route
                                 break;
                             default:
                                 Route::ErrorPage404();
+                        }
+                    } else {
+                        Route::ErrorPage404();
+                    }
+                    break;
+                case 'user':
+                    if (!empty($routes[2])) {
+                        if ($routes[2] == 'profile') {
+                            include "models/ModelUser.php";
+                            include "controllers/ControllerUser.php";
+                            $controller = new ControllerUser();
+                            $controller->profile();
+                        } else {
+                            Route::ErrorPage404();
                         }
                     } else {
                         Route::ErrorPage404();
