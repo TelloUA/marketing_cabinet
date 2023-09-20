@@ -1,5 +1,10 @@
 <?php
 require "blocks/header.php";
+
+if ($GLOBALS['isLogged']) {
+    header('Location: /campaign/list');
+}
+
 ?>
 <body>
 <h1>Authorization</h1>
@@ -28,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     setcookie('id', $row['id'], time() + 1800);
                     //$_SESSION['user'] = $row['email'];
                     //$_SESSION['user_id'] = $row['id'];
-                    header('Location: profile');
+                    header('Location: /user/profile');
                     echo $_COOKIE['id'];
                 } else {
                     $authErr = $mainErr;

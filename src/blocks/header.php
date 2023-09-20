@@ -25,7 +25,7 @@ if($GLOBALS['isLogged'] && is_numeric($GLOBALS['user_id'])) {
         <?php
         if ($GLOBALS['isLogged']) {
             echo "<span>Hello ".$userNameOutput. "! | </span>
-                  <a href='/profile'>Profile</a> |
+                  <a href='/user/profile'>Profile</a> |
                   <a href='/campaign/list'>Campaigns</a> |
                   <a href='/exit'>Exit</a>";
         } else {
