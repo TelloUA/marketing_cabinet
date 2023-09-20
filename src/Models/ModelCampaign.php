@@ -25,10 +25,6 @@ class ModelCampaign
         return $data;
     }
 
-    public function createValidation(): array|bool {
-        //
-    }
-
     //Дуже тимчасове рішення, просто щоб запрацювала основна структура MVC, модель буде якось розділятися далі
     private function takeListData(): array {
         $data = array();
@@ -170,7 +166,7 @@ class ModelCampaign
         return $data;
     }
 
-    public function addNewCampaign(array $data): void {
+    private function addNewCampaign(array $data): void {
         $user_id = $GLOBALS['user_id'];
         $name = $data['name'];
         $type = $data['type'];
