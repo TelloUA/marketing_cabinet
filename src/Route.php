@@ -36,9 +36,6 @@ class Route
 
             } else {
                 switch ($routes[1]) {
-                    case 'authorization':
-                        include 'authorization.php';
-                        break;
                     case 'registration':
                         include 'registration.php';
                         break;

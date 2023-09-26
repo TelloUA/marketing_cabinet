@@ -36,7 +36,7 @@ class ModelLogin
                         $pwd_hash = md5($pwd);
                         $row = $userData->fetch_assoc();
                         if ($row['password'] == $pwd_hash) {
-                            $this->setCookie($row['id']);
+                            $this->setAuthCookie($row['id']);
                         } else {
                             $data['authErr'] = $mainErr;
                         }
@@ -51,10 +51,10 @@ class ModelLogin
         return $data;
     }
 
-    private function setCookie(int $id): void
+    private function setAuthCookie(int $id): void
     {
-
-        setcookie('id', $id, time() + 1800, '/');
+        $token = base64_encode($id);
+        setcookie('auth_token', $token, time() + 1800, '/');
         header('Location: /user/profile');
     }
 }

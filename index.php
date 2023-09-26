@@ -6,9 +6,12 @@ use App\Route;
 
 $isLogged = false;
 $user_id = null;
-if(isset($_COOKIE['id'])) {
-    $isLogged = true;
-    $user_id = $_COOKIE['id'];
+if(isset($_COOKIE['auth_token'])) {
+    $decode = base64_decode($_COOKIE['auth_token'], true);
+    if ($decode) {
+        $isLogged = true;
+        $user_id = $decode;
+    }
 }
 
 Route::start();
