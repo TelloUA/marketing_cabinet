@@ -16,8 +16,8 @@ Route::start();
 /*
  * campaign/list
  * campaign/create
- * ? user/profile
- * ? login/authorization
+ * user/profile
+ * login/authorization
  * ? login/registration
  * ? login/exit
  * test

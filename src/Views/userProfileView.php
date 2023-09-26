@@ -22,7 +22,7 @@ $success_submit = $data['successSubmit'];
 <body>
 <h1>Profile page</h1>
 <div style="container; width: 500px">
-    <form action="<?php echo '/user/profile'; ?>" method="post" id="profileData">
+    <form action="/user/profile" method="post" id="profileData">
         <label for="name">Your name <span class="error">*</span></label>
         <input type="text" name="name" value="<?php echo $name;?>" class="form-control">
         <span class="error"><?php echo $nameErr; ?></span><br>
