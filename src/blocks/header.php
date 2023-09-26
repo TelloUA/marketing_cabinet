@@ -29,7 +29,7 @@ if($GLOBALS['isLogged'] && is_numeric($GLOBALS['user_id'])) {
                   <a href='/campaign/list'>Campaigns</a> |
                   <a href='/exit'>Exit</a>";
         } else {
-            echo "<a href='/authorization'>Authorization</a> |
+            echo "<a href='/login/authorization'>Authorization</a> |
                   <a href='/registration'>Registration</a>";
         } ?>
         <style>
