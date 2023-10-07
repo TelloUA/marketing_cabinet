@@ -32,4 +32,8 @@ class ControllerCampaign
         }
 
     }
+
+    public function delete($id): void {
+        $this->modelCampaign->delete($id);
+    }
 }

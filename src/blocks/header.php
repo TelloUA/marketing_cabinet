@@ -34,6 +34,7 @@ if($GLOBALS['isLogged'] && is_numeric($GLOBALS['user_id'])) {
         } ?>
         <style>
             .error {color: #FF0000;}
+            .deleted {background-color: #FFD6EF;}
             .icon {width:20px;height:20px;}
         </style>
     </header>

@@ -1,8 +1,32 @@
 <?php
 if (!$GLOBALS['isLogged']) {
-    header('Location: authorization');
+    header('Location: /login/authorization');
 }
 ?>
+<script>
+    function deleteCampaign(id) {
+        // document.getElementById("campaign_id_" + id).className += ' deleted';
+
+        if(confirm('Are you really want to delete campaign No.' + id + '?')) {
+            let xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4) {
+                    window.alert(this.response);
+                    if (this.status == 200) {
+                        document.getElementById("campaign_id_" + id).className += ' deleted';
+                        document.getElementById("deletedResult").innerHTML = 'Deleted done'
+                    }
+                }
+            };
+
+            xmlhttp.open("GET", "/campaign/delete/" + id, true);
+            xmlhttp.send();
+        }
+
+
+
+    }
+</script>
 <body>
 <h1>Campaigns</h1>
 <div style="container">
@@ -25,21 +49,29 @@ if (!$GLOBALS['isLogged']) {
                                 <th>Actions</th>
                             </tr>";
     foreach ($data as $datum) {
-        $campaignsTable .= "<tr> 
-                                            <td>" . $datum['id'] . "</td>
-                                            <td>" . $datum['name'] . "</td>
-                                            <td>" . $datum['type'] . "</td>
-                                            <td>" . $datum['device'] . "</td>
-                                            <td>" . $datum['geo'] . "</td>
-                                            <td>" . $datum['url'] . "</td>
-                                            <td>" . $datum['when_add'] . "</td>
-                                            <td>
-                                                <a href=''>
-                                                    <img src='/icons/icons8-edit-32.png' alt='edit' class='icon'>
-                                                </a>
-                                                <img src='/icons/icons8-delete-100.png' alt='delete' class='icon'>
-                                            </td>
-                                        </tr>";
+        $campaignsTable .= "
+                            <tr id='campaign_id_" . $datum['id'] . "' > 
+                                <td>" . $datum['id'] . "</td>
+                                <td>" . $datum['name'] . "</td>
+                                <td>" . $datum['type'] . "</td>
+                                <td>" . $datum['device'] . "</td>
+                                <td>" . $datum['geo'] . "</td>
+                                <td>" . $datum['url'] . "</td>
+                                <td>" . $datum['when_add'] . "</td>
+                            <td>
+                            <a href=''>
+                                <img src='/images/icons8-edit-32.png' alt='edit' class='icon'>
+                            </a>
+                           
+                                <img id='" . $datum['id'] . "' 
+                                    src='/images/icons8-delete-100.png' 
+                                    alt='delete' 
+                                    class='icon'
+                                    onclick='deleteCampaign(this.id)'>
+                            
+                            </td>
+                            </tr>
+                            ";
     }
     if (count($data) > 0) {
         echo $campaignsTable;
@@ -48,5 +80,6 @@ if (!$GLOBALS['isLogged']) {
     }
 
     ?>
+    <h2 id="deletedResult"></h2>
 </div>
 </body>

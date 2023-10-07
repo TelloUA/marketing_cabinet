@@ -10,13 +10,21 @@ class Route
         $action_name = 'index';
 
         $routes = explode('/', strtolower($_SERVER['REQUEST_URI']));
-
+/*
         if (!empty($routes[3])) {
             header('Location: /'.$routes[1].'/'.$routes[2]);
         }
-
+*/
         if (!empty($routes[1])) {
-            if (!empty($routes[2])) {
+            if ($routes[1] === 'images' && !empty($routes[2])) {
+                // Handle image requests from the /images route
+                $imagePath = '/images/' . $routes[2];
+                if (file_exists($imagePath)) {
+                    // Set appropriate headers for image files
+                    readfile($imagePath);
+                    exit();
+                }
+            } else if (!empty($routes[2])) {
 
                 //double routes by mvc, only controller class is need to exist?
                 $controllerName = "App\\Controllers\\Controller".ucfirst($routes[1]);
@@ -26,7 +34,13 @@ class Route
                     $controller = new $controllerName();
                     $actionName = $routes[2];
                     if (method_exists($controller, $actionName)) {
-                        $controller->$actionName();
+
+                        if (!empty($routes[3])) {
+                            $param = $routes[3];
+                            $controller->$actionName($param);
+                        } else {
+                            $controller->$actionName();
+                        }
                     } else {
                         Route::ErrorPage404();
                     }
