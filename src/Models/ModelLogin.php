@@ -15,36 +15,36 @@ class ModelLogin
 
     private function validationAuthorizationData(): array {
 
-        $data['email'] = $data['emailErr'] = $data['authErr'] = '';
+        $data["email"] = $data["emailErr"] = $data["authErr"] = "";
         $mainErr = "Email and password didn't match";
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (empty($_POST["email"])) {
-                $data['emailErr'] = "Email is required";
+                $data["emailErr"] = "Email is required";
             } else {
                 $email = InputTransformer::transform($_POST["email"], true);
-                $data['email'] = $email;
+                $data["email"] = $email;
                 $userDataQuery = "SELECT `id`, `email`, `password` FROM `users` WHERE `email` = '$email'";
                 $conn = new DbExecutor(true, $userDataQuery);
                 $conn->execute();
                 $userData = $conn->getResult();
                 if ($userData->num_rows == 1) {
                     if (empty($_POST["pwd"])) {
-                        $data['authErr'] = $mainErr;
+                        $data["authErr"] = $mainErr;
                     } else {
                         $pwd = InputTransformer::transform($_POST["pwd"]);
                         $pwd_hash = md5($pwd);
                         $row = $userData->fetch_assoc();
-                        if ($row['password'] == $pwd_hash) {
-                            $this->setAuthCookie($row['id']);
+                        if ($row["password"] == $pwd_hash) {
+                            $this->setAuthCookie($row["id"]);
                         } else {
-                            $data['authErr'] = $mainErr;
+                            $data["authErr"] = $mainErr;
                         }
                     }
                 } else if ($userData->num_rows > 1) {
-                    $data['authErr'] = "Go to support with your email";
+                    $data["authErr"] = "Go to support with your email";
                 } else {
-                    $data['authErr'] = $mainErr;
+                    $data["authErr"] = $mainErr;
                 }
             }
         }
@@ -54,7 +54,7 @@ class ModelLogin
     private function setAuthCookie(int $id): void
     {
         $token = base64_encode($id);
-        setcookie('auth_token', $token, time() + 1800, '/');
-        header('Location: /user/profile');
+        setcookie("auth_token", $token, time() + 1800, "/");
+        header("Location: /user/profile");
     }
 }

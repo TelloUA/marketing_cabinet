@@ -27,7 +27,7 @@ class Route
             } else if (!empty($routes[2])) {
 
                 //double routes by mvc, only controller class is need to exist?
-                $controllerName = "App\\Controllers\\Controller".ucfirst($routes[1]);
+                $controllerName = 'App\\Controllers\\Controller'.ucfirst($routes[1]);
 
                 if (class_exists($controllerName)) {
 

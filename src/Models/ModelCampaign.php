@@ -39,7 +39,7 @@ class ModelCampaign
     //Дуже тимчасове рішення, просто щоб запрацювала основна структура MVC, модель буде якось розділятися далі
     private function takeListData(): array {
         $data = array();
-        $user_id = $GLOBALS['user_id'];
+        $user_id = $GLOBALS["user_id"];
         $query = "SELECT 
                 c.`id`,
                 c.`user_id`,
@@ -61,13 +61,13 @@ class ModelCampaign
         if ($dataSql->num_rows > 0) {
             while ($row = $dataSql->fetch_assoc()) {
                 $data[] = array(
-                    'id' => $row['id'],
-                    'name' => $row['name'],
-                    'type' => $row['type'],
-                    'device' => $row['device'],
-                    'geo' => $row['geo'],
-                    'url' => $row['url'],
-                    'when_add' => $row['when_add']
+                    "id" => $row["id"],
+                    "name" => $row["name"],
+                    "type" => $row["type"],
+                    "device" => $row["device"],
+                    "geo" => $row["geo"],
+                    "url" => $row["url"],
+                    "when_add" => $row["when_add"]
                 );
             }
         }
@@ -76,102 +76,102 @@ class ModelCampaign
 
     private function takeCreateData(): array {
         $data = array();
-        $data['types'] = CampaignType::getTypes();
-        $data['devices'] = Device::getDevices();
+        $data["types"] = CampaignType::getTypes();
+        $data["devices"] = Device::getDevices();
         $countriesQuery = "SELECT `id`, `name`, `short_name` FROM `geo` ORDER BY `name`;";
         $conn = new DbExecutor(true, $countriesQuery);
         $conn->execute();
         $dataSql = $conn->getResult();
         if ($dataSql->num_rows > 0) {
             while ($row = $dataSql->fetch_assoc()) {
-                $data['geoList'][] = $row['name'];
+                $data["geoList"][] = $row["name"];
             }
         }
 
-        $data['name'] = $data['type'] = $data['device'] = $data['geo'] = $data['url'] = '';
-        $data['nameErr'] = $data['typesErr'] = $data['deviceErr'] = $data['geoErr'] = $data['urlErr'] = '';
+        $data["name"] = $data["type"] = $data["device"] = $data["geo"] = $data["url"] = "";
+        $data["nameErr"] = $data["typesErr"] = $data["deviceErr"] = $data["geoErr"] = $data["urlErr"] = "";
 
         return $data;
     }
 
     private function validateCreationData(): array {
         $data = array();
-        $data['success_submit'] = true;
+        $data["success_submit"] = true;
         if (empty($_POST["name"])) {
-            $data['nameErr'] = "Name is required";
-            $data['success_submit'] = false;
+            $data["nameErr"] = "Name is required";
+            $data["success_submit"] = false;
         } else {
-            $data['name'] = InputTransformer::transform($_POST['name']);
-            $name = $data['name'];
-            $user_id = $GLOBALS['user_id'];
+            $data["name"] = InputTransformer::transform($_POST["name"]);
+            $name = $data["name"];
+            $user_id = $GLOBALS["user_id"];
             $nameExistQuery = "SELECT `name` FROM `campaigns` WHERE `user_id` = '$user_id' AND `name` = '$name'";
             $conn = new DbExecutor(true, $nameExistQuery);
             $conn->execute();
             $nameExist = $conn->getResult();
             if ($nameExist->num_rows > 0) {
-                $data['nameErr'] = "Campaign name already exist";
-                $data['success_submit'] = false;
+                $data["nameErr"] = "Campaign name already exist";
+                $data["success_submit"] = false;
             } else if (!preg_match("/^[a-zA-Z0-9 ]*$/", $name)) {
-                $data['nameErr'] = "Only letters and white space allowed";
-                $data['success_submit'] = false;
+                $data["nameErr"] = "Only letters and white space allowed";
+                $data["success_submit"] = false;
             } else if (strlen($name) > 255) {
-                $data['nameErr'] = "Name should be less than 255";
-                $data['success_submit'] = false;
+                $data["nameErr"] = "Name should be less than 255";
+                $data["success_submit"] = false;
             }
         }
 
         if (empty($_POST["type"])) {
-            $data['typeErr'] = "Campaign type is required";
-            $data['success_submit'] = false;
+            $data["typeErr"] = "Campaign type is required";
+            $data["success_submit"] = false;
         } else {
-            $data['type'] = InputTransformer::transform($_POST["type"]);
-            if (!in_array($data['type'], CampaignType::getTypes())) {
-                $data['typeErr'] = "Wrong type, select again";
-                $data['success_submit'] = false;
+            $data["type"] = InputTransformer::transform($_POST["type"]);
+            if (!in_array($data["type"], CampaignType::getTypes())) {
+                $data["typeErr"] = "Wrong type, select again";
+                $data["success_submit"] = false;
             }
         }
 
         if (empty($_POST["device"])) {
-            $data['deviceErr'] = "Device is required";
-            $data['success_submit'] = false;
+            $data["deviceErr"] = "Device is required";
+            $data["success_submit"] = false;
         } else {
-            $data['device'] = InputTransformer::transform($_POST["device"]);
-            if (!in_array($data['device'], Device::getDevices())) {
-                $data['deviceErr'] = "Wrong device, select again";
-                $data['success_submit'] = false;
+            $data["device"] = InputTransformer::transform($_POST["device"]);
+            if (!in_array($data["device"], Device::getDevices())) {
+                $data["deviceErr"] = "Wrong device, select again";
+                $data["success_submit"] = false;
             }
         }
 
         if (empty($_POST["geo"])) {
-            $data['geoErr'] = "Geo is required";
-            $data['success_submit'] = false;
+            $data["geoErr"] = "Geo is required";
+            $data["success_submit"] = false;
         } else {
-            $data['geo'] = InputTransformer::transform($_POST["geo"]);
-            $geo = $data['geo'];
+            $data["geo"] = InputTransformer::transform($_POST["geo"]);
+            $geo = $data["geo"];
             $geoExistQuery = "SELECT `id`, `name`, `short_name` FROM `geo` WHERE `name` = '$geo';";
             $conn = new DbExecutor(true, $geoExistQuery);
             $conn->execute();
             $resultGeoExist = $conn->getResult();
             if ($resultGeoExist->num_rows == 0) {
-                $data['geoErr'] = "Wrong geo, select again";
-                $data['success_submit'] = false;
+                $data["geoErr"] = "Wrong geo, select again";
+                $data["success_submit"] = false;
             } else {
-                $data['geoId'] = $resultGeoExist->fetch_assoc()['id'];
+                $data["geoId"] = $resultGeoExist->fetch_assoc()["id"];
             }
         }
 
         if (empty($_POST["url"])) {
-            $data['urlErr'] = "Url is required";
-            $data['success_submit'] = false;
+            $data["urlErr"] = "Url is required";
+            $data["success_submit"] = false;
         } else {
-            $data['url'] = InputTransformer::transform($_POST["url"]);
-            if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
-                $data['urlErr'] = "Url contains mistakes";
-                $data['success_submit'] = false;
+            $data["url"] = InputTransformer::transform($_POST["url"]);
+            if (!filter_var($data["url"], FILTER_VALIDATE_URL)) {
+                $data["urlErr"] = "Url contains mistakes";
+                $data["success_submit"] = false;
             }
         }
 
-        if ($data['success_submit']) {
+        if ($data["success_submit"]) {
             $this->addNewCampaign($data);
         }
 
@@ -179,12 +179,12 @@ class ModelCampaign
     }
 
     private function addNewCampaign(array $data): void {
-        $user_id = $GLOBALS['user_id'];
-        $name = $data['name'];
-        $type = $data['type'];
-        $device = $data['device'];
-        $geoId = $data['geoId'];
-        $url = $data['url'];
+        $user_id = $GLOBALS["user_id"];
+        $name = $data["name"];
+        $type = $data["type"];
+        $device = $data["device"];
+        $geoId = $data["geoId"];
+        $url = $data["url"];
         $insertCampaignQuery = "
         INSERT INTO `campaigns` (`user_id`, `name`, `type`, `device`, `geo`, `url`)
         VALUES ('$user_id', '$name', '$type', '$device', '$geoId', '$url');";
@@ -196,7 +196,7 @@ class ModelCampaign
         if ($this->validationDeleteCampaign($id)) {
             $this->executeDeleteCampaign($this->campaignId);
         } else {
-            $this->deleteCampaignStatusCode = '422';
+            $this->deleteCampaignStatusCode = "422";
         }
 
     }
@@ -211,7 +211,7 @@ class ModelCampaign
             $this->campaignId = $tempId;
         }
 
-        $user_id = $GLOBALS['user_id'];
+        $user_id = $GLOBALS["user_id"];
         $isDeletedQuery = "
             SELECT `c`.`is_deleted`  FROM `campaigns` `c`
             WHERE `c`.`user_id` = '$user_id' AND `c`.`id` = '$this->campaignId'";
@@ -223,7 +223,7 @@ class ModelCampaign
             $this->deleteCampaignMessage = "Campaign doesn't exist";
             return false;
         } else {
-            $isDel = $isDeleted->fetch_assoc()['is_deleted'];
+            $isDel = $isDeleted->fetch_assoc()["is_deleted"];
             if ($isDel) {
                 $this->deleteCampaignMessage = "Campaign is already deleted";
                 return false;
@@ -239,6 +239,6 @@ class ModelCampaign
         $conn = new DbExecutor(false, $deleteCampaignQuery);
         $conn->execute();
         $this->deleteCampaignMessage = "Success deleted";
-        $this->deleteCampaignStatusCode = '200';
+        $this->deleteCampaignStatusCode = "200";
     }
 }
