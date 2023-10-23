@@ -10,6 +10,10 @@ use App\Core\InputTransformer;
 
 class ModelCampaign
 {
+
+    private string $campaignId;
+    private string $deleteCampaignMessage;
+    private string $deleteCampaignStatusCode;
     public function list(): array {
         return $this->takeListData();
     }
@@ -23,6 +27,13 @@ class ModelCampaign
         }
 
         return $data;
+    }
+
+    public function delete($id): void {
+        //видаляє кампанію, вносить змінит аяксом
+            $this->deleteCampaign($id);
+            http_response_code($this->deleteCampaignStatusCode);
+            echo $this->deleteCampaignMessage;
     }
 
     //Дуже тимчасове рішення, просто щоб запрацювала основна структура MVC, модель буде якось розділятися далі
@@ -42,7 +53,8 @@ class ModelCampaign
                 c.`when_change` 
                 FROM `campaigns` c 
                 LEFT JOIN `geo` g ON g.`id` = c.`geo` 
-                WHERE c.`user_id` = '$user_id'";
+                WHERE c.`user_id` = '$user_id'
+                AND c.`is_deleted` = 0";
         $conn = new DbExecutor(true, $query);
         $conn->execute();
         $dataSql = $conn->getResult();
@@ -178,5 +190,55 @@ class ModelCampaign
         VALUES ('$user_id', '$name', '$type', '$device', '$geoId', '$url');";
         $conn = new DbExecutor(false, $insertCampaignQuery);
         $conn->execute();
+    }
+
+    private function deleteCampaign($id): void {
+        if ($this->validationDeleteCampaign($id)) {
+            $this->executeDeleteCampaign($this->campaignId);
+        } else {
+            $this->deleteCampaignStatusCode = '422';
+        }
+
+    }
+
+    private function validationDeleteCampaign($id): string {
+
+        $tempId = InputTransformer::transform($id);
+        if (!is_numeric($tempId)) {
+            $this->deleteCampaignMessage = "Campaign id not number";
+            return false;
+        } else {
+            $this->campaignId = $tempId;
+        }
+
+        $user_id = $GLOBALS['user_id'];
+        $isDeletedQuery = "
+            SELECT `c`.`is_deleted`  FROM `campaigns` `c`
+            WHERE `c`.`user_id` = '$user_id' AND `c`.`id` = '$this->campaignId'";
+        $conn = new DbExecutor(true, $isDeletedQuery);
+        $conn->execute();
+        $isDeleted = $conn->getResult();
+
+        if ($isDeleted->num_rows == 0) {
+            $this->deleteCampaignMessage = "Campaign doesn't exist";
+            return false;
+        } else {
+            $isDel = $isDeleted->fetch_assoc()['is_deleted'];
+            if ($isDel) {
+                $this->deleteCampaignMessage = "Campaign is already deleted";
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function executeDeleteCampaign(float|int|string $campaignId): void
+    {
+        $deleteCampaignQuery = "UPDATE `campaigns` SET `is_deleted` = '1' WHERE `campaigns`.`id` = '$campaignId'; ";
+        $conn = new DbExecutor(false, $deleteCampaignQuery);
+        $conn->execute();
+        $this->deleteCampaignMessage = "Success deleted";
+        $this->deleteCampaignStatusCode = '200';
     }
 }
