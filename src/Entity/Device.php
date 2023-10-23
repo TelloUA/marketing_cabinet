@@ -6,13 +6,13 @@ use App\Exceptions\NotFoundCampaignTypeException;
 
 class Device
 {
-    private static array $DEVICES = ['desktop', 'mobile'];
+    private const DEVICES = ['desktop', 'mobile'];
 
     private string $device;
 
     public function __construct(string $device)
     {
-        if (in_array($device, self::$DEVICES)) {
+        if (in_array($device, self::DEVICES)) {
             $this->device = $device;
         }
         else {
@@ -33,7 +33,7 @@ class Device
      */
     public static function getDevices(): array
     {
-        return self::$DEVICES;
+        return self::DEVICES;
     }
 
 }
