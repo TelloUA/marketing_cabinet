@@ -12,5 +12,7 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "doctrine/dbal": "3.7.*"
+    }
 }

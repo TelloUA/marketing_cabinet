@@ -50,9 +50,6 @@ class Route
 
             } else {
                 switch ($routes[1]) {
-                    case 'registration':
-                        include 'registration.php';
-                        break;
                     case 'exit':
                         include 'exit.php';
                         break;
@@ -68,7 +65,7 @@ class Route
             }
 
         } else {
-            header('Location: /authorization');
+            header('Location: /login/authorization');
         }
 
     }
