@@ -2,12 +2,21 @@
 
 namespace App;
 
+use DI\Container;
+use DI\DependencyException;
+use DI\NotFoundException;
+
 class Route
 {
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     static function start(): void
     {
         $controller_name = 'Main';
         $action_name = 'index';
+        $container = new Container();
 
         $routes = explode('/', strtolower($_SERVER['REQUEST_URI']));
 /*
@@ -26,8 +35,6 @@ class Route
                 }
             } else if (!empty($routes[2])) {
 
-                $container = new Container();
-
                 //double routes by mvc, only controller class is need to exist?
                 $controllerName = 'App\\Controllers\\Controller'.ucfirst($routes[1]);
 
@@ -35,7 +42,6 @@ class Route
 
                     $controller = $container->get($controllerName);
 
-                    //$controller = new $controllerName();
                     $actionName = $routes[2];
                     if (method_exists($controller, $actionName)) {
 
