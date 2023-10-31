@@ -12,10 +12,10 @@ class ControllerLogin
 
     private View $view;
 
-    public function __construct()
+    public function __construct(ModelLogin $modelLogin, View $view)
     {
-        $this->modelLogin = new ModelLogin();
-        $this->view = new View();
+        $this->modelLogin = $modelLogin;
+        $this->view = $view;
     }
 
     /**
