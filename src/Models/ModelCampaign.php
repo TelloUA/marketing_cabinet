@@ -14,10 +14,17 @@ class ModelCampaign
     private string $campaignId;
     private string $deleteCampaignMessage;
     private string $deleteCampaignStatusCode;
+
+    /**
+     * @return string[]
+     */
     public function list(): array {
         return $this->takeListData();
     }
 
+    /**
+     * @return string[]
+     */
     public function create(): array {
         $data = $this->takeCreateData();
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -29,14 +36,20 @@ class ModelCampaign
         return $data;
     }
 
-    public function delete($id): void {
+    /**
+     * @param string $id
+     * @return void
+     */
+    public function delete(string $id): void {
         //видаляє кампанію, вносить змінит аяксом
             $this->deleteCampaign($id);
             http_response_code($this->deleteCampaignStatusCode);
             echo $this->deleteCampaignMessage;
     }
 
-    //Дуже тимчасове рішення, просто щоб запрацювала основна структура MVC, модель буде якось розділятися далі
+    /**
+     * @return string[]
+     */
     private function takeListData(): array {
         $data = array();
         $user_id = $GLOBALS["user_id"];
@@ -74,6 +87,9 @@ class ModelCampaign
         return $data;
     }
 
+    /**
+     * @return string[]
+     */
     private function takeCreateData(): array {
         $data = array();
         $data["types"] = CampaignType::getTypes();
@@ -94,6 +110,9 @@ class ModelCampaign
         return $data;
     }
 
+    /**
+     * @return string[]
+     */
     private function validateCreationData(): array {
         $data = array();
         $data["success_submit"] = true;
@@ -178,6 +197,10 @@ class ModelCampaign
         return $data;
     }
 
+    /**
+     * @param string[] $data
+     * @return void
+     */
     private function addNewCampaign(array $data): void {
         $user_id = $GLOBALS["user_id"];
         $name = $data["name"];
@@ -192,7 +215,11 @@ class ModelCampaign
         $conn->execute();
     }
 
-    private function deleteCampaign($id): void {
+    /**
+     * @param string $id
+     * @return void
+     */
+    private function deleteCampaign(string $id): void {
         if ($this->validationDeleteCampaign($id)) {
             $this->executeDeleteCampaign($this->campaignId);
         } else {
@@ -201,7 +228,11 @@ class ModelCampaign
 
     }
 
-    private function validationDeleteCampaign($id): string {
+    /**
+     * @param string $id
+     * @return bool
+     */
+    private function validationDeleteCampaign(string $id): bool {
 
         $tempId = InputTransformer::transform($id);
         if (!is_numeric($tempId)) {
@@ -233,6 +264,10 @@ class ModelCampaign
         return true;
     }
 
+    /**
+     * @param float|int|string $campaignId
+     * @return void
+     */
     private function executeDeleteCampaign(float|int|string $campaignId): void
     {
         $deleteCampaignQuery = "UPDATE `campaigns` SET `is_deleted` = '1' WHERE `campaigns`.`id` = '$campaignId'; ";
