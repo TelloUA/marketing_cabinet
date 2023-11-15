@@ -2,12 +2,21 @@
 
 namespace App;
 
+use DI\Container;
+use DI\DependencyException;
+use DI\NotFoundException;
+
 class Route
 {
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     static function start(): void
     {
         $controller_name = 'Main';
         $action_name = 'index';
+        $container = new Container();
 
         $routes = explode('/', strtolower($_SERVER['REQUEST_URI']));
 /*
@@ -31,7 +40,8 @@ class Route
 
                 if (class_exists($controllerName)) {
 
-                    $controller = new $controllerName();
+                    $controller = $container->get($controllerName);
+
                     $actionName = $routes[2];
                     if (method_exists($controller, $actionName)) {
 
@@ -50,9 +60,6 @@ class Route
 
             } else {
                 switch ($routes[1]) {
-                    case 'registration':
-                        include 'registration.php';
-                        break;
                     case 'exit':
                         include 'exit.php';
                         break;
@@ -68,7 +75,7 @@ class Route
             }
 
         } else {
-            header('Location: /authorization');
+            header('Location: /login/authorization');
         }
 
     }

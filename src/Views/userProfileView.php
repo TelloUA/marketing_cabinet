@@ -1,7 +1,7 @@
 <?php
 
 if (!$GLOBALS['isLogged']) {
-    header('Location: /authorization');
+    header('Location: /login/authorization');
 }
 
 $name = $data['name'];

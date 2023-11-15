@@ -27,6 +27,14 @@ class DbExecutor
 
     private static string $DB_NAME = 'advertiser_cabinet';
 
+    public const connectionParams = [
+        'dbname' => 'advertiser_cabinet',
+        'user' => 'root',
+        'password' => 'root',
+        'host' => 'localhost',
+        'driver' => 'mysqli',
+    ];
+
     public function __construct(bool $hasResult, string $query)
     {
         $this->hasResult = $hasResult;
