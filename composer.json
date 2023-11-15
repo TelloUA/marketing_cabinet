@@ -12,5 +12,9 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "php": "^8.2",
+        "doctrine/dbal": "3.7.*",
+        "php-di/php-di": "^7.0"
+    }
 }

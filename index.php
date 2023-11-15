@@ -1,6 +1,6 @@
 <?php
 ini_set('display_errors', 1);
-require 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
 use App\Route;
 
@@ -21,7 +21,7 @@ Route::start();
  * campaign/create
  * user/profile
  * login/authorization
- * ? login/registration
+ * login/registration
  * ? login/exit
  * test
  */
