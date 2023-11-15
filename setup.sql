@@ -1,6 +1,6 @@
-CREATE DATABASE `advertiser_cabinet`;
+CREATE DATABASE IF NOT EXISTS `advertiser_cabinet`;
 
-CREATE TABLE `advertiser_cabinet`.`users` (
+CREATE TABLE IF NOT EXISTS `advertiser_cabinet`.`users` (
 	id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(50),
 	email VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE `advertiser_cabinet`.`users` (
 	communication_info VARCHAR(255)
 );
 
-CREATE TABLE `advertiser_cabinet`.`campaigns` (
+CREATE TABLE IF NOT EXISTS `advertiser_cabinet`.`campaigns` (
 	id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	user_id INT(11) NOT NULL,
 	name VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE `advertiser_cabinet`.`campaigns` (
 	is_deleted TINYINT(1) NOT NULL DEFAULT 0
 );
 
-CREATE TABLE `advertiser_cabinet`.`geo` (
+CREATE TABLE IF NOT EXISTS `advertiser_cabinet`.`geo` (
 	id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	name varchar(255) NOT NULL,
 	short_name varchar(2) NOT NULL

@@ -19,11 +19,11 @@ class DbExecutor
 
     private mysqli $connection;
 
-    private static string $SERVER_NAME = 'localhost';
+    private static string $SERVER_NAME = 'mysql';
 
-    private static string $USER_NAME = 'root';
+    private static string $USER_NAME = 'myuser';
 
-    private static string $PASSWORD = 'root';
+    private static string $PASSWORD = 'mypassword';
 
     private static string $DB_NAME = 'advertiser_cabinet';
 

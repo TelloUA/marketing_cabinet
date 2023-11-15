@@ -1,3 +1,3 @@
 # marketing_cabinet
 
-Run sql file to create needed DB, tables and insert dictionary
+For start project use: `docker-compose up -d`

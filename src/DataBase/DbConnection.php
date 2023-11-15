@@ -8,7 +8,7 @@ use Doctrine\DBAL\Tools\DsnParser;
 
 class DbConnection
 {
-    private const DATABASE_URL = 'mysqli://root:root@localhost/advertiser_cabinet';
+    private const DATABASE_URL = 'mysqli://myuser:mypassword@mysql/advertiser_cabinet';
 
     private array $connectionParams;
 

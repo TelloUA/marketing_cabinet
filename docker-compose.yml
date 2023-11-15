@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  php:
+    build: src/Docker
+    volumes:
+      - ./:/app
+    ports:
+      - 8000:8000
+    working_dir: /app
+    command:
+      - '-S'
+      - '0.0.0.0:8000'
+      - '-t'
+      - '/app'
+
+  mysql:
+    image: mysql:8.2
+    environment:
+      MYSQL_ROOT_PASSWORD: mysecretpassword
+      MYSQL_DATABASE: advertiser_cabinet
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
+
+volumes:
+  mysql_data:
