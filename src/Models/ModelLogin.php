@@ -54,8 +54,8 @@ class ModelLogin
                      ->createQueryBuilder()
                      ->select("id", "email", "password")
                      ->from("users")
-                     ->where("email = ?")
-                     ->setParameter(0, $data["email"])
+                     ->where("email = :email")
+                     ->setParameter("email", $data["email"])
                      ->fetchAllAssociative();
 
                 if (count($userData) == 1) {
@@ -111,8 +111,8 @@ class ModelLogin
                     ->createQueryBuilder()
                     ->select("email")
                     ->from("users")
-                    ->where("email = ?")
-                    ->setParameter(0, $data["email"])
+                    ->where("email = :email")
+                    ->setParameter("email", $data["email"])
                     ->fetchAllAssociative();
 
                 if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
@@ -139,7 +139,7 @@ class ModelLogin
             }
 
             // insert new user data
-            if ($data["emailErr"] == "" && $data["pwdErr"] == "") {
+            if (!$data["emailErr"] && !$data["pwdErr"]) {
 
                 $pwd_hash = md5($data["pwd"]);
 
@@ -148,10 +148,10 @@ class ModelLogin
                     ->getConnection()
                     ->createQueryBuilder()
                     ->insert("users")
-                    ->setValue("email", "?")
-                    ->setValue("password", "?")
-                    ->setParameter(0, $data["email"])
-                    ->setParameter(1, $pwd_hash)
+                    ->setValue("email", ":email")
+                    ->setValue("password", ":password")
+                    ->setParameter("email", $data["email"])
+                    ->setParameter("password", $pwd_hash)
                     ->executeStatement();
 
                 //check affected rows
