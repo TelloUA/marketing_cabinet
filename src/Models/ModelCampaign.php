@@ -14,9 +14,7 @@ use Doctrine\DBAL\Exception;
 class ModelCampaign
 {
     private Campaigns $campaign;
-
     private DbConnection $connection;
-
     private int $userId;
 
     public function __construct(DbConnection $connection, Campaigns $campaign)
@@ -83,7 +81,7 @@ class ModelCampaign
 
     /**
      * @param int $campaignId
-     * @return array
+     * @return string[]
      * @throws Exception
      */
     private function takeCampaignData(int $campaignId = 0): array {

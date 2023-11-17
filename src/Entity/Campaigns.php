@@ -11,14 +11,6 @@ class Campaigns
     private bool $isSuccessOperation = true;
     private int $id = 0;
 
-    //private string $name;
-    //private int $userId;
-    //private CampaignType $type;
-    //private Device $device;
-    //private int $geo;
-    //private string $url;
-    //private string $date;
-
     public function __construct(DbConnection $connection)
     {
         $this->connection = $connection;

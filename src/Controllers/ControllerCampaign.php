@@ -50,7 +50,9 @@ class ControllerCampaign
      */
     public function delete($id): void
     {
-        // має валідувати чи це число?
+        if (!is_numeric($id)) {
+            header('Location: /campaign/list');
+        }
 
         $this->modelCampaign->delete($id);
     }
