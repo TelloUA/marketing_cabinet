@@ -18,8 +18,11 @@ if(isset($_COOKIE['auth_token'])) {
 Route::start();
 
 /*
+ * Fact or potential routes
  * campaign/list
  * campaign/create
+ * campaign/edit/$id
+ * campaign/delete/$id
  * user/profile
  * login/authorization
  * login/registration

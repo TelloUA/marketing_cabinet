@@ -59,16 +59,17 @@ if (!$GLOBALS['isLogged']) {
                                 <td>" . $datum['url'] . "</td>
                                 <td>" . $datum['when_add'] . "</td>
                             <td>
-                            <a href=''>
-                                <img src='/images/icons8-edit-32.png' alt='edit' class='icon'>
-                            </a>
-                           
+                                <img 
+                                    id='" . $datum['id'] . "'
+                                    src='/images/icons8-edit-32.png'
+                                    alt='edit'
+                                    class='icon'
+                                    onclick='window.location.href=\"/campaign/edit/\"+(this.id)'>
                                 <img id='" . $datum['id'] . "' 
                                     src='/images/icons8-delete-100.png' 
                                     alt='delete' 
                                     class='icon'
                                     onclick='deleteCampaign(this.id)'>
-                            
                             </td>
                             </tr>
                             ";
