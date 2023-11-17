@@ -3,34 +3,44 @@
 namespace App\Models;
 
 
-use App\DataBase\DbExecutor;
+use App\DataBase\DbConnection;
+use App\Entity\Campaigns;
 use App\Entity\CampaignType;
 use App\Entity\Device;
 use App\Core\InputTransformer;
+use App\Exceptions\NotFoundCampaignIdException;
+use Doctrine\DBAL\Exception;
 
 class ModelCampaign
 {
+    private Campaigns $campaign;
+    private DbConnection $connection;
+    private int $userId;
 
-    private string $campaignId;
-    private string $deleteCampaignMessage;
-    private string $deleteCampaignStatusCode;
-
-    /**
-     * @return string[]
-     */
-    public function list(): array {
-        return $this->takeListData();
+    public function __construct(DbConnection $connection, Campaigns $campaign)
+    {
+        $this->connection = $connection;
+        $this->campaign = $campaign;
+        $this->userId = (int)$GLOBALS['user_id'];
     }
 
     /**
      * @return string[]
+     * @throws Exception
+     */
+    public function list(): array {
+        return $this->takeCampaignData();
+    }
+
+    /**
+     * @return string[]
+     * @throws Exception
      */
     public function create(): array {
-        $data = $this->takeCreateData();
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $validationData = $this->validateCreationData();
-            $data = array_merge($data, $validationData);
+        $data = $this->takeOptionsData();
 
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $data = array_merge($data, $this->validateCreatingData());
         }
 
         return $data;
@@ -38,242 +48,254 @@ class ModelCampaign
 
     /**
      * @param string $id
+     * @return string[]
+     * @throws Exception
+     */
+    public function edit(string $id): array {
+        $data = array_merge($this->takeOptionsData(), $this->takeCampaignData($id));
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $data = array_merge($data, $this->validateEditingData($id));
+        }
+        return $data;
+    }
+
+    /**
+     * @param string $id
      * @return void
+     * @throws Exception
      */
     public function delete(string $id): void {
-        //видаляє кампанію, вносить змінит аяксом
-            $this->deleteCampaign($id);
-            http_response_code($this->deleteCampaignStatusCode);
-            echo $this->deleteCampaignMessage;
+        $data = $this->validateDeleteCampaign($id);
+
+        if ($this->campaign->isSuccessOperation()) {
+            $data = array_merge($data, $this->executeDeleteCampaign());
+        } else {
+            $data['statusCode'] = '422';
+        }
+
+        // return http response code and message for AJAX
+        http_response_code($data['statusCode'] ?? '422');
+        echo $data['message'] ?? '';
     }
 
     /**
+     * @param int $campaignId
      * @return string[]
+     * @throws Exception
      */
-    private function takeListData(): array {
-        $data = array();
-        $user_id = $GLOBALS["user_id"];
-        $query = "SELECT 
-                c.`id`,
-                c.`user_id`,
-                c.`name`,
-                c.`type`,
-                c.`device`,
-                g.`name` as `geo`,
-                c.`limit_by_budget`,
-                c.`url`,
-                c.`when_add`,
-                c.`when_change` 
-                FROM `campaigns` c 
-                LEFT JOIN `geo` g ON g.`id` = c.`geo` 
-                WHERE c.`user_id` = '$user_id'
-                AND c.`is_deleted` = 0";
-        $conn = new DbExecutor(true, $query);
-        $conn->execute();
-        $dataSql = $conn->getResult();
-        if ($dataSql->num_rows > 0) {
-            while ($row = $dataSql->fetch_assoc()) {
-                $data[] = array(
-                    "id" => $row["id"],
-                    "name" => $row["name"],
-                    "type" => $row["type"],
-                    "device" => $row["device"],
-                    "geo" => $row["geo"],
-                    "url" => $row["url"],
-                    "when_add" => $row["when_add"]
-                );
+    private function takeCampaignData(int $campaignId = 0): array {
+
+        // basic select for campaigns
+        $campaignSelect = $this
+            ->connection
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('c.id', 'c.name', 'c.type', 'c.device', 'g.name as geo', 'c.url', 'c.when_add')
+            ->from('campaigns', 'c')
+            ->leftJoin('c', 'geo', 'g', 'c.geo = g.id');
+
+        // single campaign or all campaigns
+        if ($campaignId) {
+            $this->campaign->setId($campaignId);
+
+            //check whether the campaign belongs to the client
+            $this->campaign->validateOwner($this->userId);
+            if (!$this->campaign->isSuccessOperation()) {
+                throw new NotFoundCampaignIdException($this->campaign->getId());
             }
+
+            $data = $campaignSelect
+                ->where('c.id = :campaignId')
+                ->setParameter('campaignId', $this->campaign->getId())
+                ->fetchAssociative();
+        } else {
+            $data = $campaignSelect
+                ->where('c.user_id = :userId')
+                ->andWhere('c.is_deleted = 0')
+                ->setParameter('userId', $this->userId)
+                ->fetchAllAssociative();
         }
+
         return $data;
     }
 
     /**
      * @return string[]
+     * @throws Exception
      */
-    private function takeCreateData(): array {
-        $data = array();
+    private function takeOptionsData(): array {
+        $data = [];
         $data["types"] = CampaignType::getTypes();
         $data["devices"] = Device::getDevices();
-        $countriesQuery = "SELECT `id`, `name`, `short_name` FROM `geo` ORDER BY `name`;";
-        $conn = new DbExecutor(true, $countriesQuery);
-        $conn->execute();
-        $dataSql = $conn->getResult();
-        if ($dataSql->num_rows > 0) {
-            while ($row = $dataSql->fetch_assoc()) {
-                $data["geoList"][] = $row["name"];
-            }
-        }
+        $countries = $this
+            ->connection
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('name')
+            ->from('geo')
+            ->orderBy('name', 'ASC')
+            ->fetchAllAssociative();
 
-        $data["name"] = $data["type"] = $data["device"] = $data["geo"] = $data["url"] = "";
-        $data["nameErr"] = $data["typesErr"] = $data["deviceErr"] = $data["geoErr"] = $data["urlErr"] = "";
+        foreach ($countries as $arr) {
+            $data["geoList"][] = $arr["name"];
+        }
 
         return $data;
     }
 
     /**
      * @return string[]
+     * @throws Exception
      */
-    private function validateCreationData(): array {
-        $data = array();
-        $data["success_submit"] = true;
-        if (empty($_POST["name"])) {
-            $data["nameErr"] = "Name is required";
-            $data["success_submit"] = false;
-        } else {
-            $data["name"] = InputTransformer::transform($_POST["name"]);
-            $name = $data["name"];
-            $user_id = $GLOBALS["user_id"];
-            $nameExistQuery = "SELECT `name` FROM `campaigns` WHERE `user_id` = '$user_id' AND `name` = '$name'";
-            $conn = new DbExecutor(true, $nameExistQuery);
-            $conn->execute();
-            $nameExist = $conn->getResult();
-            if ($nameExist->num_rows > 0) {
-                $data["nameErr"] = "Campaign name already exist";
-                $data["success_submit"] = false;
-            } else if (!preg_match("/^[a-zA-Z0-9 ]*$/", $name)) {
-                $data["nameErr"] = "Only letters and white space allowed";
-                $data["success_submit"] = false;
-            } else if (strlen($name) > 255) {
-                $data["nameErr"] = "Name should be less than 255";
-                $data["success_submit"] = false;
-            }
-        }
+    private function validateCreatingData(): array {
+        $data = [];
 
-        if (empty($_POST["type"])) {
-            $data["typeErr"] = "Campaign type is required";
-            $data["success_submit"] = false;
-        } else {
-            $data["type"] = InputTransformer::transform($_POST["type"]);
-            if (!in_array($data["type"], CampaignType::getTypes())) {
-                $data["typeErr"] = "Wrong type, select again";
-                $data["success_submit"] = false;
-            }
-        }
+        // clear input data before validation
+        $data['name'] = InputTransformer::transform($_POST['name']);
+        $data['type'] = InputTransformer::transform($_POST['type']);
+        $data['device'] = InputTransformer::transform($_POST['device']);
+        $data['geo'] = InputTransformer::transform($_POST['geo']);
+        $data['url'] = InputTransformer::transform($_POST['url']);
 
-        if (empty($_POST["device"])) {
-            $data["deviceErr"] = "Device is required";
-            $data["success_submit"] = false;
-        } else {
-            $data["device"] = InputTransformer::transform($_POST["device"]);
-            if (!in_array($data["device"], Device::getDevices())) {
-                $data["deviceErr"] = "Wrong device, select again";
-                $data["success_submit"] = false;
-            }
-        }
+        // combine errors from validation
+        $data = array_merge(
+            $data,
+            $this->campaign->validateName($this->userId, $data['name']),
+            $this->campaign->validateType($data['type']),
+            $this->campaign->validateDevice($data['device']),
+            $this->campaign->validateGeo($data['geo']),
+            $this->campaign->validateUrl($data['url'])
+        );
 
-        if (empty($_POST["geo"])) {
-            $data["geoErr"] = "Geo is required";
-            $data["success_submit"] = false;
-        } else {
-            $data["geo"] = InputTransformer::transform($_POST["geo"]);
-            $geo = $data["geo"];
-            $geoExistQuery = "SELECT `id`, `name`, `short_name` FROM `geo` WHERE `name` = '$geo';";
-            $conn = new DbExecutor(true, $geoExistQuery);
-            $conn->execute();
-            $resultGeoExist = $conn->getResult();
-            if ($resultGeoExist->num_rows == 0) {
-                $data["geoErr"] = "Wrong geo, select again";
-                $data["success_submit"] = false;
-            } else {
-                $data["geoId"] = $resultGeoExist->fetch_assoc()["id"];
-            }
-        }
-
-        if (empty($_POST["url"])) {
-            $data["urlErr"] = "Url is required";
-            $data["success_submit"] = false;
-        } else {
-            $data["url"] = InputTransformer::transform($_POST["url"]);
-            if (!filter_var($data["url"], FILTER_VALIDATE_URL)) {
-                $data["urlErr"] = "Url contains mistakes";
-                $data["success_submit"] = false;
-            }
-        }
-
-        if ($data["success_submit"]) {
-            $this->addNewCampaign($data);
+        if ($this->campaign->isSuccessOperation()) {
+            $data['successSubmit'] = true;
+            $this->executeCreateCampaign($data);
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $id
+     * @return string[]
+     * @throws Exception
+     */
+    private function validateEditingData(string $id): array {
+
+        $data = [];
+
+        $this->campaign->setId((int)$id);
+
+        // clear input data before validation
+        $data['name'] = InputTransformer::transform($_POST['name']);
+        $data['type'] = InputTransformer::transform($_POST['type']);
+        $data['device'] = InputTransformer::transform($_POST['device']);
+        $data['url'] = InputTransformer::transform($_POST['url']);
+
+        // combine errors from validation
+        $data = array_merge(
+            $data,
+            $this->campaign->validateOwner($this->userId),
+            $this->campaign->validateName($this->userId, $data['name']),
+            $this->campaign->validateType($data['type']),
+            $this->campaign->validateDevice($data['device']),
+            $this->campaign->validateUrl($data['url'])
+        );
+
+        // if was any errors isSuccessSubmit will be false
+        if ($this->campaign->isSuccessOperation()) {
+            $data['successSubmit'] = true;
+            $this->executeEditCampaign($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $id
+     * @return string[]
+     * @throws Exception
+     */
+    private function validateDeleteCampaign(string $id): array {
+
+        $this->campaign->setId((int)$id);
+
+        return $this->campaign->validateDelete($this->userId);
     }
 
     /**
      * @param string[] $data
      * @return void
+     * @throws Exception
      */
-    private function addNewCampaign(array $data): void {
-        $user_id = $GLOBALS["user_id"];
-        $name = $data["name"];
-        $type = $data["type"];
-        $device = $data["device"];
-        $geoId = $data["geoId"];
-        $url = $data["url"];
-        $insertCampaignQuery = "
-        INSERT INTO `campaigns` (`user_id`, `name`, `type`, `device`, `geo`, `url`)
-        VALUES ('$user_id', '$name', '$type', '$device', '$geoId', '$url');";
-        $conn = new DbExecutor(false, $insertCampaignQuery);
-        $conn->execute();
+    private function executeCreateCampaign(array $data): void {
+        $this
+            ->connection
+            ->getConnection()
+            ->createQueryBuilder()
+            ->insert('campaigns')
+            ->setValue('user_id', ':userId')
+            ->setValue('name', ':name')
+            ->setValue('type', ':type')
+            ->setValue('device', ':device')
+            ->setValue('geo', ':geoId')
+            ->setValue('url', ':url')
+            ->setParameter('userId', $this->userId)
+            ->setParameter('name', $data['name'])
+            ->setParameter('type', $data['type'])
+            ->setParameter('device', $data['device'])
+            ->setParameter('geoId', $data['geoId'])
+            ->setParameter('url', $data['url'])
+            ->executeStatement();
     }
 
     /**
-     * @param string $id
-     * @return void
+     * @param string[] $data
+     * @throws Exception
      */
-    private function deleteCampaign(string $id): void {
-        if ($this->validationDeleteCampaign($id)) {
-            $this->executeDeleteCampaign($this->campaignId);
-        } else {
-            $this->deleteCampaignStatusCode = "422";
-        }
-
-    }
-
-    /**
-     * @param string $id
-     * @return bool
-     */
-    private function validationDeleteCampaign(string $id): bool {
-
-        $tempId = InputTransformer::transform($id);
-        if (!is_numeric($tempId)) {
-            $this->deleteCampaignMessage = "Campaign id not number";
-            return false;
-        } else {
-            $this->campaignId = $tempId;
-        }
-
-        $user_id = $GLOBALS["user_id"];
-        $isDeletedQuery = "
-            SELECT `c`.`is_deleted`  FROM `campaigns` `c`
-            WHERE `c`.`user_id` = '$user_id' AND `c`.`id` = '$this->campaignId'";
-        $conn = new DbExecutor(true, $isDeletedQuery);
-        $conn->execute();
-        $isDeleted = $conn->getResult();
-
-        if ($isDeleted->num_rows == 0) {
-            $this->deleteCampaignMessage = "Campaign doesn't exist";
-            return false;
-        } else {
-            $isDel = $isDeleted->fetch_assoc()["is_deleted"];
-            if ($isDel) {
-                $this->deleteCampaignMessage = "Campaign is already deleted";
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param float|int|string $campaignId
-     * @return void
-     */
-    private function executeDeleteCampaign(float|int|string $campaignId): void
+    private function executeEditCampaign(array $data): void
     {
-        $deleteCampaignQuery = "UPDATE `campaigns` SET `is_deleted` = '1' WHERE `campaigns`.`id` = '$campaignId'; ";
-        $conn = new DbExecutor(false, $deleteCampaignQuery);
-        $conn->execute();
-        $this->deleteCampaignMessage = "Success deleted";
-        $this->deleteCampaignStatusCode = "200";
+        $this
+            ->connection
+            ->getConnection()
+            ->createQueryBuilder()
+            ->update('campaigns')
+            ->set('name', ':name')
+            ->set('type', ':type')
+            ->set('device', ':device')
+            ->set('url',':url')
+            ->setParameter('name', $data['name'])
+            ->setParameter('type', $data['type'])
+            ->setParameter('device', $data['device'])
+            ->setParameter('url', $data['url'])
+            ->where('id = :campaignId ')
+            ->setParameter('campaignId', $this->campaign->getId())
+            ->executeStatement();
     }
+
+    /**
+     * @return string[]
+     * @throws Exception
+     */
+    private function executeDeleteCampaign(): array
+    {
+        $data = [];
+
+        $this
+            ->connection
+            ->getConnection()
+            ->createQueryBuilder()
+            ->update('campaigns')
+            ->set('is_deleted', 1)
+            ->where('id = :campaignId')
+            ->setParameter('campaignId', $this->campaign->getId())
+            ->executeStatement();
+
+        $data['message'] = "Success deleted";
+        $data['statusCode'] = "200";
+
+        return $data;
+    }
+
 }
